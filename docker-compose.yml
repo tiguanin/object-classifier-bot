@@ -1,0 +1,19 @@
+version: '2'
+
+
+services:
+
+  object-classifier:
+    build:
+      context: ./src
+
+  rabbitmq:
+    restart: always
+    image: rabbitmq:3.8-management-alpine
+    container_name: rabbitmq
+    volumes:
+      - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+    ports:
+      - 5672:5672
