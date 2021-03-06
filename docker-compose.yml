@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 
 
 services:
@@ -8,12 +8,12 @@ services:
       context: ./src
 
   rabbitmq:
-    restart: always
-    image: rabbitmq:3.8-management-alpine
+    restart: unless-stopped
+    image: rabbitmq:3-management-alpine
     container_name: rabbitmq
-    volumes:
-      - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
-      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
-      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
     ports:
       - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/object-classification/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/object-classification/rabbitmq/log/:/var/log/rabbitmq
