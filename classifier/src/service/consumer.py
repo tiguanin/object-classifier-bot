@@ -3,11 +3,11 @@ import traceback
 import pika
 from pika import exceptions
 
-from src.config import props
-from src.service.classifier import EfficientClassifier
-from src.utils import logging
+from service.classifier import EfficientClassifier
+from utils import logging
+from utils.config import props
 
-LOGGER = logging.getLogger()
+LOGGER = logging.get_logger()
 
 RMQ_PORT = props['RABBIT_MQ']['RMQ_PORT']
 RMQ_HOST = props['RABBIT_MQ']['RMQ_HOST']
@@ -24,7 +24,7 @@ CLASSIFIER = EfficientClassifier()
 def consume():
     credentials = pika.PlainCredentials(RMQ_USER, RMQ_PASSWORD)
     parameters = pika.ConnectionParameters(host=RMQ_HOST, port=RMQ_PORT, heartbeat=RMQ_HEARTBEAT_INTERVAL,
-                                           credentials=credentials)
+                                           credentials=credentials, socket_timeout=15)
 
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
@@ -51,7 +51,12 @@ def on_message(channel, method_frame, properties, body):
     LOGGER.info("get input image {}".format(body))
     try:
         image_path = body
-        CLASSIFIER.predict(image_path)
+        predicts_json = CLASSIFIER.predict(image_path)
+        channel.basic_publish(exchange=RMQ_EXCHANGE_QUEUE,
+                              routing_key=RMQ_OUTPUT_QUEUE,
+                              body=predicts_json,
+                              properties=pika.BasicProperties(content_type='application/json'))
+        LOGGER.info('Message publish was confirmed')
 
     except Exception as e:
         LOGGER.error("error during process {}, error: {}".format(body, traceback.format_exc()))

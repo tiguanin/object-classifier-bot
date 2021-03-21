@@ -1,19 +1,31 @@
-version: '3.2'
+version: '3.4'
 
 
 services:
-
-  object-classifier:
-    build:
-      context: ./src
 
   rabbitmq:
     restart: unless-stopped
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
     ports:
-      - 5672:5672
-      - 15672:15672
+      - '5672:5672'
+      - '15672:15672'
     volumes:
-      - ~/object-classification/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/object-classification/rabbitmq/log/:/var/log/rabbitmq
+      - /opt/object-classifier/rabbitmq/data/:/var/lib/rabbitmq/
+      - /opt/object-classifier/rabbitmq/log/:/var/log/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+
+  object-classifier:
+    build: ./classifier
+    container_name: object-classifier
+    network_mode: host
+    volumes:
+      - /opt/docker-object-classification/classifier-logs/:/opt/docker-object-classification/classifier-logs/
+      - /opt/docker-object-classification/input-images/:/opt/docker-object-classification/input-images/
+    depends_on:
+      - rabbitmq

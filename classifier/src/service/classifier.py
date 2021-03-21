@@ -1,12 +1,11 @@
 import json
 import os
+from pathlib import Path
 
 import torch
 from PIL import Image
 from efficientnet_pytorch import EfficientNet
 from torchvision import transforms
-
-import src
 
 
 class EfficientClassifier:
@@ -19,7 +18,7 @@ class EfficientClassifier:
         self._initialize_model()
 
     def _initialize_model(self):
-        path = os.path.dirname(src.__file__)
+        path = str(Path(os.path.abspath(__file__)).parents[1])
         labels_map = json.load(open(path + '/labels_map.txt'))
         self.labels_map = [labels_map[str(i)] for i in range(1000)]
         self.model = EfficientNet.from_pretrained(self.MODEL_NAME)
@@ -32,7 +31,7 @@ class EfficientClassifier:
         image = tfms(image).unsqueeze(0)
         return image
 
-    def predict(self, img_path):
+    def predict(self, img_path) -> json:
         image = Image.open(img_path)
         preprocessed_image = self._preprocess_image(image)
 
@@ -40,8 +39,11 @@ class EfficientClassifier:
             logits = self.model(preprocessed_image)
         preds = torch.topk(logits, k=5).indices.squeeze(0).tolist()
 
+        predicts_json = {"predicts": []}
         print('-----')
         for idx in preds:
             label = self.labels_map[idx]
             prob = torch.softmax(logits, dim=1)[0, idx].item()
             print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+            predicts_json["predicts"].append({"label": label, "prob": format(prob * 100, ".2f")})
+        return predicts_json
