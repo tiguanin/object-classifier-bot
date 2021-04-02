@@ -1,9 +1,9 @@
 #!/bin/sh
 
-mkdir -p /opt/docker-object-classification &&
-  chmod 777 /opt/docker-object-classification &&
-  mkdir -p /opt/docker-object-classification/input-images &&
-  chmod 777 /opt/docker-object-classification/input-images &&
-  mkdir -p /opt/docker-object-classification/classifier-logs &&
-  chmod 777 /opt/docker-object-classification/classifier-logs &&
-  touch /opt/docker-object-classification/classifier-logs/classifier.log || exit
+mkdir -p /opt/object-classifier &&
+  chmod 777 /opt/object-classifier &&
+  mkdir -p /opt/object-classifier/input-images &&
+  chmod 777 /opt/object-classifier/input-images &&
+  mkdir -p /opt/object-classifier/classifier-logs &&
+  chmod 777 /opt/object-classifier/classifier-logs &&
+  touch /opt/object-classifier/classifier-logs/classifier.log || exit

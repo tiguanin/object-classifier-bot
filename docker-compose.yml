@@ -11,7 +11,7 @@ services:
       - '5672:5672'
       - '15672:15672'
     volumes:
-      - /opt/object-classifier/rabbitmq/data/:/var/lib/rabbitmq/
+      - /opt/object-classifier/rabbitmq/data/:/var  /lib/rabbitmq/
       - /opt/object-classifier/rabbitmq/log/:/var/log/rabbitmq
     healthcheck:
       test: rabbitmq-diagnostics -q ping
@@ -25,7 +25,7 @@ services:
     container_name: object-classifier
     network_mode: host
     volumes:
-      - /opt/docker-object-classification/classifier-logs/:/opt/docker-object-classification/classifier-logs/
-      - /opt/docker-object-classification/input-images/:/opt/docker-object-classification/input-images/
+      - /opt/object-classifier/classifier-logs/:/opt/object-classifier/classifier-logs/
+      - /opt/object-classifier/input-images/:/opt/object-classifier/input-images/
     depends_on:
       - rabbitmq

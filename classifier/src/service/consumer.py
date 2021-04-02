@@ -1,3 +1,4 @@
+import json
 import traceback
 
 import pika
@@ -24,7 +25,7 @@ CLASSIFIER = EfficientClassifier()
 def consume():
     credentials = pika.PlainCredentials(RMQ_USER, RMQ_PASSWORD)
     parameters = pika.ConnectionParameters(host=RMQ_HOST, port=RMQ_PORT, heartbeat=RMQ_HEARTBEAT_INTERVAL,
-                                           credentials=credentials, socket_timeout=15)
+                                           credentials=credentials)
 
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
@@ -52,9 +53,9 @@ def on_message(channel, method_frame, properties, body):
     try:
         image_path = body
         predicts_json = CLASSIFIER.predict(image_path)
-        channel.basic_publish(exchange=RMQ_EXCHANGE_QUEUE,
+        channel.basic_publish(exchange='',
                               routing_key=RMQ_OUTPUT_QUEUE,
-                              body=predicts_json,
+                              body=json.dumps(predicts_json),
                               properties=pika.BasicProperties(content_type='application/json'))
         LOGGER.info('Message publish was confirmed')
 
