@@ -40,9 +40,7 @@ class TelegramBot:
     def help_command(self, update: Update, context: CallbackContext) -> None:
         update.message.reply_text("It's simple. No help needed.")
 
-    def stop_rabbitmq_connection(
-        self, update: Update, context: CallbackContext
-    ) -> None:
+    def stop_rabbitmq_connection(self) -> None:
         try:
             self.channel.close()
             self.connection.close()
@@ -54,7 +52,7 @@ class TelegramBot:
             self.LOGGER.error("Connection closed by broker. Recovering again...")
             traceback.print_exc()
         finally:
-            update.message.reply_text("💔 Connection closed.")
+            self.LOGGER.info("💔 Connection with rabbitMQ closed.")
 
     def classify_image(self, update: Update, context: CallbackContext) -> None:
         file = update.message.photo[-1].get_file()

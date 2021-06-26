@@ -16,7 +16,9 @@ RMQ_PASSWORD = props.get("RABBIT_MQ", "RMQ_PASSWORD")
 
 
 def init_rabbitmq_connection():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost", port=5672))
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host="localhost", port=5672)
+    )
     channel = connection.channel()
     channel.queue_declare(queue=RMQ_INPUT_QUEUE)
     return connection, channel
